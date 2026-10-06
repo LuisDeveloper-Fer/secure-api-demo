@@ -21,12 +21,17 @@ def request(route, body=None, headers=None):
 for _ in range(90):
     try:
         if request('/actuator/health')[0] == 200: break
-    except urllib.error.URLError: pass
+    except OSError: pass
     time.sleep(2)
 else: raise RuntimeError('API did not become ready')
 
-with urllib.request.urlopen('http://localhost:4200',timeout=10) as response:
-    assert b'<app-root>' in response.read(), 'Angular shell missing'
+for _ in range(30):
+    try:
+        with urllib.request.urlopen('http://localhost:4200',timeout=5) as response:
+            assert b'<app-root>' in response.read(), 'Angular shell missing'
+            break
+    except OSError: time.sleep(1)
+else: raise RuntimeError('Frontend did not become ready')
 
 from urllib.parse import urlencode
 for _ in range(90):
@@ -35,7 +40,7 @@ for _ in range(90):
         token_request = urllib.request.Request('http://localhost:8180/realms/backend-lab/protocol/openid-connect/token', data=data)
         with urllib.request.urlopen(token_request,timeout=5) as response: token=json.load(response)['access_token']
         break
-    except (urllib.error.URLError,KeyError): time.sleep(2)
+    except (OSError,KeyError): time.sleep(2)
 else: raise RuntimeError('Keycloak did not issue a token')
 headers = {'Authorization': 'Bearer ' + token}
 assert request('/api/me')[0] == 401
