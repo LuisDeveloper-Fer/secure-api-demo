@@ -1,0 +1,8 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:./certs/server.p12
+    key-store-password: local-demo-password
+    key-store-type: PKCS12
+    enabled-protocols: TLSv1.3,TLSv1.2

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: secure-api-demo
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI:http://localhost:8180/realms/backend-lab}
+          jwk-set-uri: ${JWK_SET_URI:http://localhost:8180/realms/backend-lab/protocol/openid-connect/certs}
+          audiences: backend-api
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+server:
+  shutdown: graceful
+  error:
+    include-message: never
